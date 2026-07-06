@@ -6,8 +6,8 @@ Replaces face_arcface.py + yolo_detector.py + faiss_db.py with a single class.
 - Model pack is configurable via FACE_MODEL env var:
     "buffalo_l"  -> best accuracy (~330MB, downloaded once at first run)
     "buffalo_s"  -> smaller (~50MB), still good accuracy for classroom-size datasets
-  Default: buffalo_l (best accuracy). Change to buffalo_s if you need a smaller
-  runtime footprint (e.g. very constrained free-tier disk).
+  Default: buffalo_s (smaller footprint, needed for free-tier hosting memory limits).
+  Change to buffalo_l if you have more RAM available and want best accuracy.
 """
 import os
 import numpy as np
@@ -21,7 +21,14 @@ class FaceEngine:
     _instance = None
 
     def __init__(self):
-        self.app = FaceAnalysis(name=MODEL_NAME, providers=["CPUExecutionProvider"])
+        # allowed_modules restricts insightface to only load detection + recognition
+        # models (skips age/gender/landmark models we don't use), which saves
+        # a good chunk of RAM — important on memory-constrained free hosting tiers.
+        self.app = FaceAnalysis(
+            name=MODEL_NAME,
+            providers=["CPUExecutionProvider"],
+            allowed_modules=["detection", "recognition"],
+        )
         self.app.prepare(ctx_id=0, det_size=(DET_SIZE, DET_SIZE))
 
     @classmethod
