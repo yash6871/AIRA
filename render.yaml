@@ -12,8 +12,10 @@ services:
     envVars:
       - key: SECRET_KEY
         generateValue: true
+      - key: FACE_DET_SIZE
+        value: "320"  
       - key: FACE_MODEL
-        value: buffalo_l
+        value: buffalo_s
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: DATABASE_URL
