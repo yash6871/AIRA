@@ -13,8 +13,8 @@ import os
 import numpy as np
 from insightface.app import FaceAnalysis
 
-MODEL_NAME = os.environ.get("FACE_MODEL", "buffalo_l")
-DET_SIZE = int(os.environ.get("FACE_DET_SIZE", "640"))
+MODEL_NAME = os.environ.get("FACE_MODEL", "buffalo_s")
+DET_SIZE = int(os.environ.get("FACE_DET_SIZE", "320"))
 
 
 class FaceEngine:
