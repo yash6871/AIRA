@@ -1,0 +1,141 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2 class="page-title mb-1"><i class="fa fa-chart-line" style="font-size:22px;color:var(--accent-2);"></i> Attendance Analytics</h2>
+<p class="page-subtitle">Overview of students, attendance totals, and trends.</p>
+
+<!-- ===== STAT CARDS ===== -->
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="card p-4 text-center stat-card">
+      <h6>Total Students</h6>
+      <h1>{{ total_students }}</h1>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card p-4 text-center stat-card">
+      <h6>Total Attendance</h6>
+      <h1>{{ total_attendance }}</h1>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card p-4 text-center stat-card">
+      <h6>Today Present</h6>
+      <h1>{{ today_present }}</h1>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GRAPHS ===== -->
+<div class="row">
+  <!-- DONUT -->
+  <div class="col-md-6 mb-4">
+    <div class="card p-4">
+      <h5 class="text-center mb-3">Batch Wise Students</h5>
+      <canvas id="batchPie"></canvas>
+    </div>
+  </div>
+
+  <!-- BAR -->
+  <div class="col-md-6 mb-4">
+    <div class="card p-4">
+      <h5 class="text-center mb-3">Batch Wise Attendance</h5>
+      <canvas id="batchBar"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- LINE -->
+<div class="card p-4 mt-3">
+  <h5 class="text-center mb-3">Attendance Trend</h5>
+  <canvas id="trendLine"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// ✅ SAFE DATA (IMPORTANT)
+const batchLabels = {{ batch_labels | tojson }};
+const batchCounts = {{ batch_counts | tojson }};
+
+const attLabels = {{ att_labels | tojson }};
+const attCounts = {{ att_counts | tojson }};
+
+const dates = {{ dates | tojson }};
+const dateCounts = {{ date_counts | tojson }};
+
+const isLight = document.body.classList.contains("light-mode");
+Chart.defaults.color = isLight ? "#54607a" : "#93a1ba";
+Chart.defaults.borderColor = isLight ? "rgba(15,23,42,0.08)" : "rgba(255,255,255,0.08)";
+
+/* ===== DONUT ===== */
+new Chart(document.getElementById("batchPie"), {
+  type: "doughnut",
+  data: {
+    labels: batchLabels,
+    datasets: [{
+      data: batchCounts,
+      backgroundColor: [
+        "#6366f1",
+        "#22d3ee",
+        "#34d399",
+        "#fbbf24",
+        "#f87171"
+      ],
+      borderWidth: 2,
+      borderColor: isLight ? "#ffffff" : "#121826"
+    }]
+  },
+  options: {
+    cutout: "65%",
+    plugins: {
+      legend: { position: "bottom" }
+    }
+  }
+});
+
+/* ===== BAR ===== */
+const barCtx = document.getElementById("batchBar").getContext("2d");
+
+const gradient = barCtx.createLinearGradient(0, 0, 0, 300);
+gradient.addColorStop(0, "#22d3ee");
+gradient.addColorStop(1, "#6366f1");
+
+new Chart(barCtx, {
+  type: "bar",
+  data: {
+    labels: attLabels,
+    datasets: [{
+      data: attCounts,
+      backgroundColor: gradient,
+      borderRadius: 10
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } }
+  }
+});
+
+/* ===== LINE ===== */
+new Chart(document.getElementById("trendLine"), {
+  type: "line",
+  data: {
+    labels: dates,
+    datasets: [{
+      label: "Attendance",
+      data: dateCounts,
+      borderColor: "#34d399",
+      backgroundColor: "rgba(52,211,153,0.15)",
+      fill: true,
+      tension: 0.4
+    }]
+  },
+  options: {
+    plugins: { legend: { display: true } }
+  }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="upload-wrapper">
+    <h2 class="page-title"><i class="fa fa-camera" style="font-size:22px;color:var(--accent-2);"></i> Upload Classroom Photo</h2>
+    <p class="page-subtitle">Upload a group photo to automatically mark attendance for recognized faces.</p>
+
+    <div class="upload-card">
+        <form method="POST" enctype="multipart/form-data">
+
+            <!-- 🔥 BATCH SELECT (NEW, SAFE) -->
+            <div class="mb-3">
+                <label class="form-label">Select Batch</label>
+                <select name="batch" class="form-select">
+                    <option value="ALL">All Batches</option>
+                    {% for b in batches %}
+                        <option value="{{ b }}">{{ b }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- IMAGE UPLOAD -->
+            <div class="mb-3">
+                <label class="form-label">Classroom Photo</label>
+                <input type="file" name="photo" required>
+            </div>
+
+            <button type="submit" class="btn btn-success mt-3 w-100">
+                Mark Attendance
+            </button>
+        </form>
+    </div>
+</div>
+
+{% if image_url %}
+<div class="upload-wrapper mt-4">
+    <div class="upload-card text-center">
+        <h5>Detected Faces</h5>
+        <img src="{{ image_url }}" class="img-fluid rounded mt-3">
+    </div>
+</div>
+{% endif %}
+
+{% if names %}
+<div class="upload-wrapper mt-4">
+    <div class="upload-card">
+        <div class="alert alert-success mb-0">
+            <b>Attendance Marked For:</b>
+            <ul class="mt-2 mb-0">
+                {% for n in names %}
+                <li>{{ n }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

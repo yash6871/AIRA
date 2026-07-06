@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIRA · Attendance Intelligence</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<!-- ================= MOBILE TOPBAR ================= -->
+<div class="topbar">
+    <button class="icon-btn" onclick="toggleSidebar()" aria-label="Open menu">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="brand brand-sm">
+        <i class="fa-solid fa-fingerprint"></i>
+        <span>AIRA</span>
+    </div>
+    <button class="icon-btn theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+        <i class="fa-solid fa-moon" id="themeIconMobile"></i>
+    </button>
+</div>
+
+<!-- ================= BACKDROP (mobile) ================= -->
+<div class="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+<!-- ================= SIDEBAR ================= -->
+<div class="sidebar">
+    <div class="logo d-flex align-items-center gap-2">
+        <div class="brand">
+            <span class="brand-icon"><i class="fa-solid fa-fingerprint logo-icon"></i></span>
+            <span class="logo-text">AIRA</span>
+        </div>
+
+        <!-- SIDEBAR TOGGLE (desktop collapse / mobile close) -->
+        <button class="toggle-btn" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+            <i class="fa fa-bars"></i>
+        </button>
+
+        <!-- THEME TOGGLE -->
+        <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+            <i class="fa fa-moon" id="themeIcon"></i>
+        </button>
+    </div>
+
+    <nav>
+        <a href="/" class="{% if request.path == '/' %}active{% endif %}"><i class="fa fa-house"></i> <span>Dashboard</span></a>
+        <a href="/students" class="{% if request.path == '/students' %}active{% endif %}"><i class="fa fa-users"></i> <span>Students</span></a>
+        <a href="/register" class="{% if request.path == '/register' %}active{% endif %}"><i class="fa fa-user-plus"></i> <span>Register Student</span></a>
+        <a href="/upload" class="{% if request.path == '/upload' %}active{% endif %}"><i class="fa fa-camera"></i> <span>Upload Image</span></a>
+        <a href="/live_attendance" class="{% if request.path == '/live_attendance' %}active{% endif %}"><i class="fa fa-satellite-dish"></i> <span>Live Attendance</span></a>
+        <a href="/upload_video" class="{% if request.path == '/upload_video' %}active{% endif %}"><i class="fa fa-video"></i> <span>Upload Video</span></a>
+        <a href="/records" class="{% if request.path == '/records' %}active{% endif %}"><i class="fa fa-table"></i> <span>Attendance Records</span></a>
+        <a href="/analytics" class="{% if request.path == '/analytics' %}active{% endif %}"><i class="fa fa-chart-line"></i> <span>Analytics</span></a>
+        <a href="/student_analytics" class="{% if request.path == '/student_analytics' %}active{% endif %}"><i class="fa fa-user-check"></i> <span>Student Analytics</span></a>
+        <a href="/analytics_monthly" class="{% if request.path == '/analytics_monthly' %}active{% endif %}"><i class="fa fa-calendar"></i> <span>Monthly Charts</span></a>
+        <a href="/export"><i class="fa fa-file-csv"></i> <span>Export CSV</span></a>
+
+        <div class="nav-divider"></div>
+
+        <a href="/student_login" class="{% if request.path == '/student_login' %}active{% endif %}">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>Student Portal <em>Read Only</em></span>
+        </a>
+
+        <a href="/logout" class="nav-logout"><i class="fa fa-right-from-bracket"></i> <span>Logout</span></a>
+    </nav>
+
+    <div class="sidebar-brand-card">
+        <i class="fa-solid fa-brain sidebar-brand-glow"></i>
+        <div class="sidebar-brand-title">AIRA</div>
+        <div class="sidebar-brand-sub">Smart Attendance,<br>Smarter Future.</div>
+    </div>
+</div>
+
+<!-- ================= DESKTOP TOPBAR ================= -->
+<div class="desktop-topbar">
+    <div class="dt-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search students, records...">
+    </div>
+    <div class="dt-actions">
+        <div style="position:relative;">
+            <button class="icon-btn dt-icon" onclick="toggleDropdown('notifDrop')"><i class="fa-regular fa-bell"></i><span class="dt-dot"></span></button>
+            <div class="dt-dropdown" id="notifDrop">
+                <div class="dt-notif-empty">No new notifications</div>
+            </div>
+        </div>
+        <div style="position:relative;">
+            <div class="dt-profile" onclick="toggleDropdown('profileDrop')">
+                <div class="dt-avatar">T</div>
+                <div class="dt-profile-info">
+                    <span class="dt-name">Teacher</span>
+                    <span class="dt-status"><i class="fa-solid fa-circle"></i> Online</span>
+                </div>
+                <i class="fa-solid fa-chevron-down dt-chevron"></i>
+            </div>
+            <div class="dt-dropdown" id="profileDrop">
+                <a href="/students"><i class="fa-solid fa-users"></i> My Students</a>
+                <a href="/analytics"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+                <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="main">
+    {% block content %}{% endblock %}
+</div>
+
+<script>
+function toggleDropdown(id){
+    const el = document.getElementById(id);
+    document.querySelectorAll('.dt-dropdown').forEach(d=>{ if(d.id!==id) d.classList.remove('open'); });
+    el.classList.toggle('open');
+}
+document.addEventListener('click', function(e){
+    if(!e.target.closest('.dt-icon') && !e.target.closest('.dt-profile') && !e.target.closest('.dt-dropdown')){
+        document.querySelectorAll('.dt-dropdown').forEach(d=>d.classList.remove('open'));
+    }
+});
+
+function toggleSidebar() {
+    document.body.classList.toggle("sidebar-collapsed");
+}
+
+function syncThemeIcon(){
+    const isLight = document.body.classList.contains("light-mode");
+    document.querySelectorAll("#themeIcon, #themeIconMobile").forEach(el=>{
+        el.classList.toggle("fa-moon", !isLight);
+        el.classList.toggle("fa-sun", isLight);
+    });
+}
+
+function toggleTheme(){
+    document.body.classList.toggle("light-mode");
+    localStorage.setItem(
+        "theme",
+        document.body.classList.contains("light-mode") ? "light" : "dark"
+    );
+    syncThemeIcon();
+}
+
+(function(){
+    if(localStorage.getItem("theme") === "light"){
+        document.body.classList.add("light-mode");
+    }
+    syncThemeIcon();
+})();
+</script>
+
+</body>
+</html>

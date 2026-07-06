@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="upload-wrapper">
+    <h2 class="page-title"><i class="fa fa-satellite-dish" style="font-size:22px;color:var(--accent-2);"></i> Live Attendance</h2>
+    <p class="subtitle">Laptop webcam aur mobile camera dono pe kaam karta hai — koi desktop popup nahi khulta.</p>
+
+    <div class="upload-card text-center">
+        <div id="camWrap" style="position:relative;display:inline-block;max-width:500px;width:100%;">
+            <video id="cam" autoplay playsinline muted style="width:100%;background:#000;display:block;"></video>
+            <canvas id="overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></canvas>
+        </div>
+
+        <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button type="button" class="btn btn-success" id="startBtn">▶ Start Recognizing</button>
+            <button type="button" class="btn btn-danger" id="stopBtn" disabled>⏹ Stop</button>
+        </div>
+        <div id="status" style="margin-top:16px;"></div>
+    </div>
+</div>
+
+<script src="/static/js/camera.js"></script>
+<script>
+let stream = null;
+let intervalId = null;
+const video = document.getElementById("cam");
+const overlay = document.getElementById("overlay");
+const ctx = overlay.getContext("2d");
+const statusEl = document.getElementById("status");
+const startBtn = document.getElementById("startBtn");
+const stopBtn = document.getElementById("stopBtn");
+
+function resizeOverlay() {
+    overlay.width = video.videoWidth;
+    overlay.height = video.videoHeight;
+}
+
+function drawBoxes(faces) {
+    ctx.clearRect(0, 0, overlay.width, overlay.height);
+    faces.forEach(f => {
+        const [x1, y1, x2, y2] = f.box;
+        const color = f.status === "unknown" ? "#ff4d4d" : "#22c55e";
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+
+        const label = f.status === "unknown" ? "Unknown" : `${f.name} (${f.score})`;
+        ctx.font = "16px Arial";
+        const textWidth = ctx.measureText(label).width;
+
+        ctx.fillStyle = color;
+        ctx.fillRect(x1, y1 - 22, textWidth + 10, 22);
+
+        ctx.fillStyle = "#000";
+        ctx.fillText(label, x1 + 5, y1 - 6);
+    });
+}
+
+startBtn.onclick = async () => {
+    try {
+        stream = await startCamera(video);
+        video.onloadedmetadata = resizeOverlay;
+    } catch (err) {
+        alert("Camera access nahi mila. Permission allow karo (HTTPS zaroori hai mobile ke liye).");
+        return;
+    }
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+
+    intervalId = setInterval(async () => {
+        if (video.videoWidth === 0) return;
+        resizeOverlay();
+
+        const frame = captureFrame(video);
+        try {
+            const res = await fetch("/api/recognize", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ image: frame })
+            });
+            const data = await res.json();
+
+            if (data.faces && data.faces.length > 0) {
+                drawBoxes(data.faces);
+                statusEl.innerHTML = data.faces.map(f => {
+                    if (f.status === "marked") return `✅ <b>${f.name}</b> — attendance marked (score ${f.score})`;
+                    if (f.status === "matched") return `☑️ <b>${f.name}</b> — already marked today`;
+                    return `❓ Unknown face`;
+                }).join("<br>");
+            } else {
+                ctx.clearRect(0, 0, overlay.width, overlay.height);
+                statusEl.textContent = "No face detected...";
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }, 1500); // recognize every 1.5s — light enough for free-tier CPU
+};
+
+stopBtn.onclick = () => {
+    clearInterval(intervalId);
+    ctx.clearRect(0, 0, overlay.width, overlay.height);
+    stopCamera(stream);
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    statusEl.textContent = "Stopped.";
+};
+</script>
+
+{% endblock %}

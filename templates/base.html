@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Attendance System</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <i class="fa fa-bars" onclick="toggleSidebar()"></i>
+    <span>Teacher Dashboard</span>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+    <h2>🤖 AI Attendance</h2>
+
+    <a href="/"><i class="fa fa-home"></i> Dashboard</a>
+    <a href="/students"><i class="fa fa-users"></i> Students</a>
+    <a href="/upload"><i class="fa fa-camera"></i> Upload</a>
+    <a href="/records"><i class="fa fa-table"></i> Records</a>
+    <a href="/analytics"><i class="fa fa-chart-line"></i> Analytics</a>
+    <a href="/export"><i class="fa fa-file-csv"></i> Export CSV</a>
+    <a href="/logout" class="logout"><i class="fa fa-sign-out-alt"></i> Logout</a>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main" id="main">
+    {% block content %}{% endblock %}
+</div>
+
+<script>
+function toggleSidebar(){
+    document.getElementById("sidebar").classList.toggle("open");
+    document.getElementById("main").classList.toggle("shift");
+}
+</script>
+
+</body>
+</html>

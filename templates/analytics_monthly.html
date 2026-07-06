@@ -1,0 +1,137 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2 class="page-title"><i class="fa fa-calendar" style="font-size:22px;color:var(--accent-2);"></i> Monthly Attendance</h2>
+<p class="page-subtitle">Trends, comparisons, and distribution for a selected month.</p>
+
+<form method="GET" class="mb-4 d-flex align-items-center gap-2 flex-wrap">
+  <label class="mb-0">Select Month:</label>
+  <input type="month" name="month"
+         value="{{ selected_month }}"
+         class="form-control w-auto">
+  <button class="btn btn-primary">Apply</button>
+</form>
+
+<!-- ===== LINE CHART ===== -->
+<div class="card p-4 mb-4">
+  <h6 class="mb-3 text-muted">📈 Attendance Trend</h6>
+  <canvas id="lineChart" height="120"></canvas>
+</div>
+
+<!-- ===== BAR + PIE GRID ===== -->
+<div class="row g-4">
+
+  <!-- BAR -->
+  <div class="col-md-6">
+    <div class="card p-4 h-100">
+      <h6 class="mb-3 text-muted">📊 Daily Comparison</h6>
+      <canvas id="barChart" height="220"></canvas>
+    </div>
+  </div>
+
+  <!-- PIE -->
+  <div class="col-md-6">
+    <div class="card p-4 h-100">
+      <h6 class="mb-3 text-muted">🟢 Attendance Distribution</h6>
+      <canvas id="pieChart" height="220"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// ✅ SAFE DATA (IMPORTANT)
+const labels = {{ dates | tojson }};
+const dataCounts = {{ counts | tojson }};
+
+const isLight = document.body.classList.contains("light-mode");
+Chart.defaults.color = isLight ? "#54607a" : "#93a1ba";
+Chart.defaults.borderColor = isLight ? "rgba(15,23,42,0.08)" : "rgba(255,255,255,0.08)";
+
+// ---------- LINE ----------
+new Chart(document.getElementById("lineChart"), {
+  type: "line",
+  data: {
+    labels: labels,
+    datasets: [{
+      label: "Attendance",
+      data: dataCounts,
+      borderColor: "#22d3ee",
+      backgroundColor: "rgba(34,211,238,0.15)",
+      fill: true,
+      tension: 0.4
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } }
+  }
+});
+
+// ---------- BAR ----------
+new Chart(document.getElementById("barChart"), {
+  type: "bar",
+  data: {
+    labels: labels,
+    datasets: [{
+      label: "Attendance",
+      data: dataCounts,
+      backgroundColor: "#34d399",
+      borderRadius: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } }
+  }
+});
+
+// ---------- DOUGHNUT ----------
+new Chart(document.getElementById("pieChart"), {
+  type: "doughnut",
+  data: {
+    labels: labels,
+    datasets: [{
+      data: dataCounts,
+      backgroundColor: [
+        "#6366f1",
+        "#22d3ee",
+        "#34d399",
+        "#fbbf24",
+        "#f87171",
+        "#a78bfa"
+      ],
+      borderWidth: 2,
+      borderColor: isLight ? "#ffffff" : "#121826"
+    }]
+  },
+  options: {
+    responsive: true,
+    cutout: "65%",
+    plugins: {
+      legend: {
+        position: "right",
+        labels: {
+          boxWidth: 12,
+          padding: 15
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: function(ctx) {
+            const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+            const val = ctx.raw;
+            const pct = ((val/total)*100).toFixed(1);
+            return `${ctx.label}: ${val} (${pct}%)`;
+          }
+        }
+      }
+    }
+  }
+});
+</script>
+
+{% endblock %}

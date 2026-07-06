@@ -1,0 +1,212 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="dash-head">
+    <div>
+        <div class="dash-greet">👋 Welcome back, Teacher!</div>
+        <div class="dash-title">Teacher Dashboard</div>
+        <div class="dash-sub">Manage students, track attendance, and generate insights effortlessly.</div>
+    </div>
+    <div class="date-pill"><i class="fa-solid fa-calendar-days"></i> {{ today_str }}</div>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card violet">
+        <div class="stat-top">
+            <div class="stat-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div class="stat-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+        <div class="stat-label">Total Students</div>
+        <div class="stat-value">{{ stats.total_students }}</div>
+        <div class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> Active roster</div>
+    </div>
+
+    <div class="stat-card cyan">
+        <div class="stat-top">
+            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+        <div class="stat-label">Today's Present</div>
+        <div class="stat-value">{{ stats.present_today }}</div>
+        <div class="stat-trend up">{{ stats.attendance_pct }}% Attendance</div>
+    </div>
+
+    <div class="stat-card amber">
+        <div class="stat-top">
+            <div class="stat-icon"><i class="fa-solid fa-user-xmark"></i></div>
+            <div class="stat-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+        <div class="stat-label">Today's Absent</div>
+        <div class="stat-value">{{ stats.absent_today }}</div>
+        <div class="stat-trend down"><i class="fa-solid fa-arrow-trend-down"></i> {{ 100 - stats.attendance_pct }}% Absent</div>
+    </div>
+
+    <div class="stat-card emerald">
+        <div class="stat-top">
+            <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+            <div class="stat-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+        <div class="stat-label">Total Sessions</div>
+        <div class="stat-value">{{ stats.sessions_today }}</div>
+        <div class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> Recorded so far</div>
+    </div>
+</div>
+
+<div class="section-title"><i class="fa-solid fa-bolt"></i> Quick Actions</div>
+<div class="qa-grid">
+    <div class="qa-card c-indigo">
+        <div class="qa-icon"><i class="fa-solid fa-user-plus"></i></div>
+        <div class="qa-title">Register Student</div>
+        <div class="qa-desc">Add new student to the system</div>
+        <div class="qa-row">
+            <a href="/register" class="qa-btn">Register Now</a>
+            <div class="qa-arrow-circle"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+    </div>
+    <div class="qa-card c-cyan">
+        <div class="qa-icon"><i class="fa-solid fa-camera"></i></div>
+        <div class="qa-title">Upload Class Photo</div>
+        <div class="qa-desc">Upload class photo for recognition</div>
+        <div class="qa-row">
+            <a href="/upload" class="qa-btn">Upload Photo</a>
+            <div class="qa-arrow-circle"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+    </div>
+    <div class="qa-card c-violet">
+        <div class="qa-icon"><i class="fa-solid fa-video"></i></div>
+        <div class="qa-title">Live Camera Attendance</div>
+        <div class="qa-desc">Start real-time attendance</div>
+        <div class="qa-row">
+            <a href="/live_attendance" class="qa-btn">Start Now</a>
+            <div class="qa-arrow-circle"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+    </div>
+    <div class="qa-card c-emerald">
+        <div class="qa-icon"><i class="fa-solid fa-file-lines"></i></div>
+        <div class="qa-title">Attendance Records</div>
+        <div class="qa-desc">View and manage records</div>
+        <div class="qa-row">
+            <a href="/records" class="qa-btn">View Records</a>
+            <div class="qa-arrow-circle"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+    </div>
+    <div class="qa-card c-amber">
+        <div class="qa-icon"><i class="fa-solid fa-file-csv"></i></div>
+        <div class="qa-title">Export CSV</div>
+        <div class="qa-desc">Download attendance data</div>
+        <div class="qa-row">
+            <a href="/export" class="qa-btn">Export Now</a>
+            <div class="qa-arrow-circle"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+    </div>
+</div>
+
+<div class="analytics-row">
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Attendance Overview</h3>
+            <select class="panel-select"><option>This Week</option><option>This Month</option></select>
+        </div>
+        <div class="chart-wrap"><canvas id="attendanceLineChart"></canvas></div>
+    </div>
+
+    <div class="side-col">
+        <div class="panel">
+            <div class="panel-head"><h3>Recent Activity</h3><span class="view-all-btn">View All</span></div>
+            {% if stats.recent %}
+                {% for r in stats.recent %}
+                <div class="activity-item">
+                    <div class="activity-icon i-emerald"><i class="fa-solid fa-user-check"></i></div>
+                    <div class="activity-body">
+                        <div class="activity-title">{{ r[0] }} marked present</div>
+                        <div class="activity-sub">Roll {{ r[1] }} • {{ r[3] }}</div>
+                    </div>
+                    <div class="activity-time">{{ r[2] }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="activity-item">
+                    <div class="activity-icon i-cyan"><i class="fa-solid fa-info"></i></div>
+                    <div class="activity-body">
+                        <div class="activity-title">No activity yet</div>
+                        <div class="activity-sub">Start live attendance to see updates</div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="analytics-row" style="margin-bottom:22px;">
+    <div class="panel">
+        <div class="panel-head"><h3>Average Attendance</h3></div>
+        <div class="donut-wrap">
+            <div class="chart-wrap" style="height:220px;width:220px;"><canvas id="attendanceDonut"></canvas></div>
+            <div class="donut-legend">
+                <span><i class="dot dot-cyan"></i> Present ({{ stats.present_today }})</span>
+                <span><i class="dot dot-violet"></i> Absent ({{ stats.absent_today }})</span>
+            </div>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel-head"><h3>Today's Summary</h3></div>
+        <div class="summary-grid">
+            <div class="summary-box s-cyan"><div class="summary-val">{{ stats.present_today }}</div><div class="summary-label">Present</div></div>
+            <div class="summary-box s-amber"><div class="summary-val">{{ stats.absent_today }}</div><div class="summary-label">Absent</div></div>
+            <div class="summary-box s-violet"><div class="summary-val">{{ stats.attendance_pct }}%</div><div class="summary-label">Attendance</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="quote-strip">
+    <div>
+        <div class="quote-text"><i class="fa-solid fa-quote-left"></i> Consistency in attendance leads to excellence in performance.</div>
+        <div class="quote-sub">— Stay consistent, stay ahead!</div>
+    </div>
+    <i class="fa-solid fa-graduation-cap quote-icon"></i>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function(){
+    const weekData = {{ stats.week|tojson }};
+    const labels = weekData.length ? weekData.map(r => r[0]) : ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+    const values = weekData.length ? weekData.map(r => r[1]) : [0,0,0,0,0,0,0];
+
+    const ctx = document.getElementById('attendanceLineChart');
+    const grad = ctx.getContext('2d').createLinearGradient(0,0,0,260);
+    grad.addColorStop(0,'rgba(34,211,238,0.35)');
+    grad.addColorStop(1,'rgba(168,85,247,0.02)');
+
+    new Chart(ctx, {
+        type:'line',
+        data:{ labels:labels, datasets:[{
+            label:'Present', data:values, fill:true,
+            backgroundColor:grad, borderColor:'#22d3ee',
+            tension:0.4, pointBackgroundColor:'#a855f7', pointRadius:4, borderWidth:3
+        }]},
+        options:{
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ display:false } },
+            scales:{
+                x:{ grid:{ display:false }, ticks:{ color:'#93a1ba' } },
+                y:{ grid:{ color:'rgba(255,255,255,0.06)' }, ticks:{ color:'#93a1ba' } }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('attendanceDonut'), {
+        type:'doughnut',
+        data:{ labels:['Present','Absent'], datasets:[{
+            data:[{{ stats.present_today }}, {{ stats.absent_today }}],
+            backgroundColor:['#22d3ee','#a855f7'], borderWidth:0
+        }]},
+        options:{
+            responsive:true, maintainAspectRatio:false, cutout:'72%',
+            plugins:{ legend:{ display:false } }
+        }
+    });
+})();
+</script>
+
+{% endblock %}

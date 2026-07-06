@@ -1,0 +1,36 @@
+{% extends "auth_layout.html" %}
+{% block content %}
+
+<div class="form-container">
+    <div class="form-card">
+        <i class="fa-solid fa-shield-halved" style="font-size:30px;color:var(--accent-2);margin-bottom:10px;"></i>
+        <h2>Admin Login</h2>
+        <p class="subtitle">Sign in to manage attendance for your institute</p>
+
+        {% if error %}
+        <div style="background:var(--danger-soft);color:var(--danger);padding:10px 14px;border-radius:10px;margin-bottom:16px;font-size:14px;">{{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+            <div class="input-group">
+                <label>Username</label>
+                <input class="form-control" name="username" placeholder="Enter your username">
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input class="form-control" type="password" name="password" placeholder="Enter your password">
+            </div>
+
+            <button class="btn btn-primary w-100" style="padding:12px;">
+                <i class="fa-solid fa-lock"></i> Login
+            </button>
+
+            <p style="margin-top:16px;font-size:14px;color:var(--text-muted);">
+                New Institute? <a href="/signup">Create Account</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

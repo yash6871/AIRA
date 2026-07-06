@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="student-dashboard-wrapper">
+
+  <div class="student-card">
+
+    <h2>👋 Welcome, {{ name }} ({{ roll }})</h2>
+    <p class="batch-text">Batch: <b>{{ batch }}</b></p>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <span>Total</span>
+        <h3>{{ total }}</h3>
+      </div>
+      <div class="stat-box green">
+        <span>Present</span>
+        <h3>{{ present }}</h3>
+      </div>
+      <div class="stat-box red">
+        <span>Absent</span>
+        <h3>{{ absent }}</h3>
+      </div>
+      <div class="stat-box blue">
+        <span>Attendance %</span>
+        <h3>{{ percentage }}%</h3>
+      </div>
+    </div>
+
+    <hr>
+
+    <h4 class="table-title">📅 Attendance History</h4>
+
+    <table class="attendance-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+          <th>Confidence</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
+        <tr>
+          <td>{{ r[0] }}</td>
+          <td>{{ r[1] }}</td>
+          <td>
+            <span class="status {{ r[2]|lower }}">{{ r[2] }}</span>
+          </td>
+          <td>{{ r[3] }}%</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+{% endblock %}

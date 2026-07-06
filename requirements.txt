@@ -1,0 +1,13 @@
+flask==3.0.3
+werkzeug==3.0.3
+jinja2==3.1.4
+psycopg2-binary==2.9.9
+numpy==1.26.4
+opencv-python-headless==4.10.0.84
+pillow==10.4.0
+insightface==0.7.3 ; sys_platform != "win32"
+insightface @ https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp311-cp311-win_amd64.whl ; sys_platform == "win32" and python_version == "3.11"
+insightface @ https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp312-cp312-win_amd64.whl ; sys_platform == "win32" and python_version == "3.12"
+insightface @ https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp313-cp313-win_amd64.whl ; sys_platform == "win32" and python_version == "3.13"
+onnxruntime==1.18.1
+gunicorn==22.0.0

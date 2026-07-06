@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- ===== HEADER ===== -->
+<div class="students-header">
+    <h2>Registered Students</h2>
+
+    <div class="actions">
+        <a href="/register" class="btn btn-primary btn-sm">➕ Add Student</a>
+
+        <form method="GET" action="/reset_system"
+              onsubmit="return confirm('⚠ DELETE ALL STUDENTS & ATTENDANCE?')">
+            <button class="btn btn-warning btn-sm">
+                ♻ Reset
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ===== SEARCH ===== -->
+<input type="text" id="studentSearch"
+       class="student-search"
+       placeholder="🔍 Search student by name..."
+       onkeyup="filterStudents()">
+
+<!-- ===== STUDENT GRID ===== -->
+<div id="studentsContainer">
+
+{% if students %}
+{% for s in students %}
+  <div class="student-card">
+
+    <img src="{{ s.photo }}"
+         class="student-avatar"
+         onerror="this.src='/static/default.jpg'">
+
+    <h4 class="student-name">{{ s.name }}</h4>
+    <p class="roll">Roll No: {{ s.roll }}</p>
+
+    <span class="batch">{{ s.batch }}</span>
+
+    <span class="status">Registered</span>
+
+    <!-- ✅ FIXED DELETE -->
+    <form action="/delete_student/{{ s.roll }}" method="post">
+        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+    </form>
+
+  </div>
+{% endfor %}
+{% else %}
+  <p class="text-muted">No students found</p>
+{% endif %}
+
+</div>
+
+<script>
+function filterStudents() {
+    let input = document.getElementById("studentSearch").value.toLowerCase();
+    let cards = document.getElementsByClassName("student-card");
+
+    for (let i = 0; i < cards.length; i++) {
+        let name = cards[i]
+            .getElementsByClassName("student-name")[0]
+            .innerText.toLowerCase();
+
+        cards[i].style.display = name.includes(input) ? "flex" : "none";
+    }
+}
+</script>
+
+{% endblock %}

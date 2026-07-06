@@ -1,0 +1,27 @@
+{% extends "auth_layout.html" %}
+{% block content %}
+
+<div class="student-login-wrapper">
+  <div class="student-login-card">
+    <i class="fa-solid fa-graduation-cap" style="font-size:30px;color:var(--accent-2);margin-bottom:10px;"></i>
+    <h2>Student Portal</h2>
+    <p class="subtitle">View your attendance record</p>
+
+    {% if error %}
+      <div style="background:var(--danger-soft);color:var(--danger);padding:10px 14px;border-radius:10px;margin-bottom:16px;font-size:14px;">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+      <input
+        type="text"
+        name="roll"
+        placeholder="Enter Roll Number"
+        required
+      >
+
+      <button type="submit">View Attendance</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

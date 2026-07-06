@@ -1,0 +1,23 @@
+{% extends "auth_layout.html" %}
+{% block content %}
+
+<div class="login-container">
+    <i class="fa-solid fa-building-columns" style="font-size:30px;color:var(--accent-2);margin-bottom:10px;"></i>
+    <h2>Create Institute Account</h2>
+
+    {% if error %}
+        <p style="color:var(--danger);margin-bottom:14px;">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST">
+        <input type="text" name="institute" placeholder="Institute Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+
+        <button type="submit">Create Account</button>
+    </form>
+
+    <p>Already have account? <a href="/login">Login</a></p>
+</div>
+
+{% endblock %}

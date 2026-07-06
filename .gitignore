@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+aira.db
+static/results/*
+static/students/*
+uploads/*.mp4
+*.whl
+styles/
+translations/

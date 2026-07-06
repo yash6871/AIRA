@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="form-container">
+    <div class="form-card register-card">
+        <h2>Register Student</h2>
+        <p class="subtitle">Camera se 5 photo capture karo (laptop webcam ya phone camera — dono chalte hain)</p>
+
+        {% if error %}
+        <div style="background:var(--danger-soft);color:var(--danger);padding:10px 14px;border-radius:10px;margin-bottom:16px;font-size:14px;text-align:left;">{{ error }}</div>
+        {% endif %}
+
+        <div style="display:flex;justify-content:center;">
+            <video id="cam" autoplay playsinline muted
+                   style="width:100%;max-width:320px;border-radius:16px;background:#000;"></video>
+        </div>
+
+        <div style="text-align:center;margin:16px 0;">
+            <button type="button" class="btn-primary" id="captureBtn" style="width:auto;">
+                📸 Capture Photo (<span id="count">0</span>/5)
+            </button>
+        </div>
+
+        <div id="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;"></div>
+
+        <form method="POST" id="regForm">
+            <div class="input-group">
+                <label>Student Name</label>
+                <input type="text" name="name" placeholder="Enter student name" required>
+            </div>
+
+            <div class="input-group">
+                <label>Roll Number</label>
+                <input type="text" name="roll" placeholder="Enter roll number" required>
+            </div>
+
+            <div class="input-group">
+                <label>Batch / Class / Course</label>
+                <input type="text" name="batch" placeholder="e.g. DATA SCIENCE, 10th A, MBA Sem 2..." required>
+            </div>
+
+            <div id="hiddenImages"></div>
+
+            <button type="submit" class="btn-primary w-100" id="submitBtn" disabled>
+                Register Student
+            </button>
+        </form>
+
+        <a href="/" class="back-link">← Back to Dashboard</a>
+    </div>
+</div>
+
+<script src="/static/js/camera.js"></script>
+<script>
+let captured = [];
+const video = document.getElementById("cam");
+const countEl = document.getElementById("count");
+const thumbs = document.getElementById("thumbs");
+const submitBtn = document.getElementById("submitBtn");
+
+startCamera(video).catch(err => {
+    alert("Camera access nahi mila. Browser permission allow karo, aur HTTPS pe hona chahiye (mobile ke liye zaroori).");
+    console.error(err);
+});
+
+document.getElementById("captureBtn").onclick = () => {
+    if (captured.length >= 5) return;
+    const dataUrl = captureFrame(video);
+    captured.push(dataUrl);
+    countEl.textContent = captured.length;
+
+    const img = document.createElement("img");
+    img.src = dataUrl;
+    img.style.width = "55px";
+    img.style.height = "55px";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "8px";
+    img.style.border = "2px solid #4ade80";
+    thumbs.appendChild(img);
+
+    if (captured.length >= 1) submitBtn.disabled = false;
+};
+
+document.getElementById("regForm").addEventListener("submit", () => {
+    const container = document.getElementById("hiddenImages");
+    container.innerHTML = "";
+    captured.forEach(dataUrl => {
+        const inp = document.createElement("input");
+        inp.type = "hidden";
+        inp.name = "images";
+        inp.value = dataUrl;
+        container.appendChild(inp);
+    });
+});
+</script>
+
+{% endblock %}
